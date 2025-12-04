@@ -1,0 +1,58 @@
+form {
+    display: flex;
+    flex-direction: column;
+    width: 400px;
+    margin: 40px auto;
+    padding: 32px 24px;
+    background: #f7f7fa;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+    gap: 18px;
+}
+
+form input,
+form select,
+form textarea {
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    background: #fff;
+    transition: border-color 0.2s;
+}
+
+form input:focus,
+form select:focus,
+form textarea:focus {
+    border-color: #6c63ff;
+    outline: none;
+}
+
+form button {
+    padding: 12px;
+    background: #6c63ff;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+form button:hover {
+    background: #5548c8;
+}
+
+form p {
+    margin: 0;
+    font-size: 0.98rem;
+    color: #e53935;
+    text-align: center;
+}
+
+h1 {
+    text-align: center;
+    font-family: "Segoe UI", Arial, sans-serif;
+    margin-top: 32px;
+    color: #333;
+}
