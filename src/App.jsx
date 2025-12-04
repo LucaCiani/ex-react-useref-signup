@@ -1,17 +1,18 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 function App() {
-    const [nome, setNome] = useState("");
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const [specializzazione, setSpecializzazione] = useState("");
-    const [anni, setAnni] = useState("");
     const [descrizione, setDescrizione] = useState("");
     const [error, setError] = useState("");
 
     const [usernameError, setUsernameError] = useState("");
     const [passwordError, setPasswordError] = useState("");
     const [descrizioneError, setDescrizioneError] = useState("");
+
+    const nomeRef = useRef();
+    const specializzazioneRef = useRef();
+    const anniRef = useRef();
 
     const isUsernameValid = /^[a-zA-Z0-9]{6,}$/.test(username);
     const isPasswordValid =
@@ -66,6 +67,10 @@ function App() {
     const handleSubmit = (e) => {
         e.preventDefault();
 
+        const nome = nomeRef.current.value;
+        const specializzazione = specializzazioneRef.current.value;
+        const anni = anniRef.current.value;
+
         if (
             !nome.trim() ||
             !username.trim() ||
@@ -103,8 +108,7 @@ function App() {
                 <input
                     type="text"
                     placeholder="Nome completo..."
-                    value={nome}
-                    onChange={(e) => setNome(e.target.value)}
+                    ref={nomeRef}
                 />
                 <input
                     type="text"
@@ -130,10 +134,7 @@ function App() {
                     ) : (
                         <p style={{ color: "red" }}>{passwordError}</p>
                     ))}
-                <select
-                    value={specializzazione}
-                    onChange={(e) => setSpecializzazione(e.target.value)}
-                >
+                <select ref={specializzazioneRef} defaultValue="">
                     <option value="">Seleziona specializzazione</option>
                     <option value="Full Stack">Full Stack</option>
                     <option value="Frontend">Frontend</option>
@@ -142,8 +143,7 @@ function App() {
                 <input
                     type="number"
                     placeholder="Anni di esperienza..."
-                    value={anni}
-                    onChange={(e) => setAnni(e.target.value)}
+                    ref={anniRef}
                 />
                 <textarea
                     placeholder="Descriviti in minimo 100 caratteri..."
