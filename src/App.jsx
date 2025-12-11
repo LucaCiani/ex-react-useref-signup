@@ -1,68 +1,45 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
+
+const letters = "abcdefghijklmnopqrstuvwxyz";
+const numbers = "0123456789";
+const symbols = "!@#$%^&*()-_=+[]{}|;:'\",.<>?/`~";
 
 function App() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [descrizione, setDescrizione] = useState("");
-    const [error, setError] = useState("");
 
-    const [usernameError, setUsernameError] = useState("");
-    const [passwordError, setPasswordError] = useState("");
-    const [descrizioneError, setDescrizioneError] = useState("");
+    const [error, setError] = useState("");
 
     const nomeRef = useRef();
     const specializzazioneRef = useRef();
     const anniRef = useRef();
 
-    const isUsernameValid = /^[a-zA-Z0-9]{6,}$/.test(username);
-    const isPasswordValid =
-        password.length >= 8 &&
-        /[A-Za-z]/.test(password) &&
-        /[0-9]/.test(password) &&
-        /[^A-Za-z0-9]/.test(password);
-    const descrizioneTrimmed = descrizione.trim();
-    const isDescrizioneValid =
-        descrizioneTrimmed.length >= 100 && descrizioneTrimmed.length <= 1000;
-
-    const handleUsernameChange = (e) => {
-        const value = e.target.value;
-        setUsername(value);
-        if (!/^[a-zA-Z0-9]{6,}$/.test(value)) {
-            setUsernameError(
-                "Username: solo lettere e numeri, minimo 6 caratteri."
+    const isUsernameValid = useMemo(() => {
+        const charsValid = username
+            .split("")
+            .every(
+                (char) =>
+                    letters.includes(char.toLocaleLowerCase()) ||
+                    numbers.includes(char)
             );
-        } else {
-            setUsernameError("");
-        }
-    };
+        return charsValid && username.length >= 0;
+    }, [username]);
 
-    const handlePasswordChange = (e) => {
-        const value = e.target.value;
-        setPassword(value);
-        if (
-            value.length < 8 ||
-            !/[A-Za-z]/.test(value) ||
-            !/[0-9]/.test(value) ||
-            !/[^A-Za-z0-9]/.test(value)
-        ) {
-            setPasswordError(
-                "Password: min 8 caratteri, 1 lettera, 1 numero, 1 simbolo."
-            );
-        } else {
-            setPasswordError("");
-        }
-    };
+    const isPasswordValid = useMemo(() => {
+        return (
+            password.length >= 8 &&
+            password.split("").some((char) => letters.includes(char)) &&
+            password.split("").some((char) => numbers.includes(char)) &&
+            password.split("").some((char) => symbols.includes(char))
+        );
+    }, [password]);
 
-    const handleDescrizioneChange = (e) => {
-        const value = e.target.value;
-        setDescrizione(value);
-        const trimmed = value.trim();
-        if (trimmed.length < 100 || trimmed.length > 1000) {
-            setDescrizioneError("Descrizione: tra 100 e 1000 caratteri.");
-        } else {
-            setDescrizioneError("");
-        }
-    };
+    const isDescrizioneValid = useMemo(() => {
+        return (
+            descrizione.trim().length >= 100 && descrizione.trim().length < 1000
+        );
+    }, [descrizione]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -77,17 +54,13 @@ function App() {
             !password.trim() ||
             !specializzazione ||
             !anni ||
-            !descrizione.trim()
+            anni < 0 ||
+            !descrizione.trim() ||
+            !isUsernameValid ||
+            !isPasswordValid ||
+            !isDescrizioneValid
         ) {
             setError("Compila tutti i campi!");
-            return;
-        }
-        if (isNaN(anni) || Number(anni) <= 0) {
-            setError("Anni di esperienza deve essere un numero positivo!");
-            return;
-        }
-        if (usernameError || passwordError || descrizioneError) {
-            setError("Correggi gli errori nei campi evidenziati.");
             return;
         }
         setError("");
@@ -114,25 +87,29 @@ function App() {
                     type="text"
                     placeholder="Username..."
                     value={username}
-                    onChange={handleUsernameChange}
+                    onChange={(e) => setUsername(e.target.value)}
                 />
                 {username &&
                     (isUsernameValid ? (
                         <p style={{ color: "green" }}>Username valido!</p>
                     ) : (
-                        <p style={{ color: "red" }}>{usernameError}</p>
+                        <p style={{ color: "red" }}>
+                            6 caratteri alfanumerici.
+                        </p>
                     ))}
                 <input
                     type="password"
                     placeholder="Password..."
                     value={password}
-                    onChange={handlePasswordChange}
+                    onChange={(e) => setPassword(e.target.value)}
                 />
                 {password &&
                     (isPasswordValid ? (
                         <p style={{ color: "green" }}>Password valida!</p>
                     ) : (
-                        <p style={{ color: "red" }}>{passwordError}</p>
+                        <p style={{ color: "red" }}>
+                            8 caratteri, 1 lettera, 1 numero, 1 simbolo.
+                        </p>
                     ))}
                 <select ref={specializzazioneRef} defaultValue="">
                     <option value="">Seleziona specializzazione</option>
@@ -148,13 +125,18 @@ function App() {
                 <textarea
                     placeholder="Descriviti in minimo 100 caratteri..."
                     value={descrizione}
-                    onChange={handleDescrizioneChange}
+                    onChange={(e) => setDescrizione(e.target.value)}
                 />
                 {descrizione &&
                     (isDescrizioneValid ? (
-                        <p style={{ color: "green" }}>Descrizione valida!</p>
+                        <p style={{ color: "green" }}>
+                            Descrizione valida! ({descrizione.trim().length})
+                        </p>
                     ) : (
-                        <p style={{ color: "red" }}>{descrizioneError}</p>
+                        <p style={{ color: "red" }}>
+                            Minimo 100 caratteri, massimo 1000 (
+                            {descrizione.trim().length})
+                        </p>
                     ))}
                 <button type="submit">Registrati</button>
                 {error && <p style={{ color: "red" }}>{error}</p>}
